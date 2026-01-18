@@ -12,13 +12,7 @@ if file.Exists("aether/db/config/sv_config.lua", "LUA") then
     include("aether/db/config/sv_config.lua")
 end
 
-local DB_CONFIG = Aether.Config and Aether.Config.Database or {
-    host = "localhost",
-    username = "root",
-    password = "",
-    database = "v2_aether_dev",
-    port = 3306
-}
+local DB_CONFIG = Aether.Config and Aether.Config.Database
 
 -- [[ CONNECTION & KEEP-ALIVE ]]
 function Aether.Database.Initialize()

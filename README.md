@@ -42,6 +42,11 @@ Aether.Config.Database = {
 
 > **Note :** Ce fichier contient des identifiants sensibles. Assurez-vous qu'il est ignoré par votre gestionnaire de version (ex: `.gitignore`) si vous partagez le code.
 
+## 📚 Documentation SQL
+
+Pour le détail technique des tables et relations (MCD/MLD) :
+👉 [**Voir le Schéma de Données (DATABASE_SCHEMA.md)**](docs/DATABASE_SCHEMA.md)
+
 ## 🔄 Système de Migration
 
 Aether DB dispose d'un système de migration **automatique et dynamique**.
@@ -88,29 +93,60 @@ end
 Ce module expose l'objet global `Aether.Database`.
 Il est conçu pour être utilisé par d'autres addons (ex: `aether_core`).
 
-### 1. Requête Simple (Non-Bloquante)
+### 1. Lecture (Query avec Paramètres)
+
+Vous pouvez aussi utiliser `Prepare` pour la lecture pour éviter d'utiliser `Escape` manuellement.
 
 ```lua
-Aether.Database.Query("SELECT * FROM users WHERE id = 'steamid'", function(data)
+-- Plus besoin de 'Aether.Database.Escape(steamID)' !
+local sql = "SELECT * FROM aether_accounts WHERE id = ?"
+
+Aether.Database.Prepare(sql, { "STEAM_0:0:12345" }, function(data)
     PrintTable(data)
 end)
 ```
 
-### 2. File d'Attente (Write-Behind)
+### 2. Écriture Sécurisée (Prepare) - RECOMMANDÉ
 
-Pour les écritures fréquentes (sauvegardes, logs) où vous n'avez pas besoin d'attendre la réponse.
-Cela garantit que le serveur ne lag pas ("lag-free").
-
-```lua
--- La requête sera exécutée en arrière-plan
-Aether.Database.AddToQueue("UPDATE users SET money = 100 WHERE id = 'steamid'")
-```
-
-### 3. Échappement (Sécurité)
-
-Toujours échapper les données utilisateur pour éviter les injections SQL.
+Utilisez `Prepare` pour vos INSERT et UPDATE. Cela utilise des **Placeholders (`?`)** pour empêcher les injections SQL à 100%.
 
 ```lua
-local cleanName = Aether.Database.Escape(ply:Nick())
-local query = "UPDATE users SET name = " .. cleanName
+-- Les '?' seront remplacés par les valeurs de la table
+local sql = "UPDATE aether_accounts SET balance = ? WHERE id = ?"
+local params = { 5000, "STEAM_0:0:12345" }
+
+Aether.Database.Prepare(sql, params, function()
+    print("Sauvegarde réussie !")
+end)
 ```
+
+### 3. Transactions (Performance)
+
+Pour sauvegarder beaucoup de données d'un coup (ex: Save All), utilisez les transactions pour ne faire qu'une seule écriture disque.
+
+```lua
+Aether.Database.BeginTransaction()
+
+for _, ply in ipairs(player.GetAll()) do
+    local sql = "UPDATE aether_players SET money = ? WHERE steamid = ?"
+    Aether.Database.Prepare(sql, { ply:GetMoney(), ply:SteamID64() })
+end
+
+Aether.Database.Commit() -- Tout appliquer d'un coup
+```
+
+### 4. File d'Attente (Write-Behind)
+
+Pour les logs ou les actions non-critiques, `AddToQueue` permet de rendre la main immédiatement.
+
+```lua
+Aether.Database.AddToQueue("INSERT INTO logs ...")
+```
+
+---
+
+## ⚡ Fonctionnalités Avancées
+
+- **Keep-Alive :** Le système ping la base toutes les 5min pour éviter l'erreur "MySQL Server has gone away".
+- **Circuit Breaker :** Si la DB plante, le système passe automatiquement en mode "Sécurité" pour ne pas freeze le serveur.
+- **Watchdog :** Un timer surveille la file d'attente pour s'assurer qu'elle ne se bloque jamais.
