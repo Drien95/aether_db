@@ -1,0 +1,102 @@
+-- [[ 1. CRÉATION DES CATÉGORIES ]]
+INSERT IGNORE INTO aether_categories (id, name) VALUES
+('weapons', 'Armement'),
+('attachments', 'Accessoires'),
+('entities', 'Divers'),
+('cosmetics', 'Équipement'),
+('food', 'Nourriture');
+
+-- [[ 2. IMPORTATION DES ARMES ]]
+REPLACE INTO aether_definitions (class_id, name, category_id, type, weight, width, height, description, model, data) VALUES
+('arc9_k_z4', 'Z-4', 'weapons', 'weapon', 18.5, 4, 2, 'Z-4 : Équivalence de la Z-6 Républicaine version Séparatiste.', 'models/error.mdl', '{}'),
+('arc9_k_z6', 'Z-6', 'weapons', 'weapon', 18.5, 4, 3, 'Z-6 : Puissant canon à blaster rotatif développé par Merr-Sonn Munitions.', 'models/error.mdl', '{}'),
+('arc9_k_z6adv', 'Z-6 Avancé', 'weapons', 'weapon', 18.9, 4, 3, 'Z-6 avancé : Puissant canon à blaster rotatif cadencé.', 'models/error.mdl', '{}'),
+('arc9_k_launcher_rps6_republic', 'RPS-6', 'weapons', 'weapon', 8.6, 5, 2, 'RPS-6 : Lance roquette produit par Merr-Sonn Munitions.', 'models/error.mdl', '{}'),
+('arc9_k_launcher_plx1_republic', 'PLX-1', 'weapons', 'weapon', 9.8, 5, 2, 'PLX-1 : Lanceur missile anti-véhicule longue portée.', 'models/error.mdl', '{}'),
+('arc9_k_dc15s', 'DC-15S', 'weapons', 'weapon', 3.5, 3, 1, 'DC-15S : Carabine standard.', 'models/error.mdl', '{}'),
+('arc9_galactic_dc15se', 'DC-15SE', 'weapons', 'weapon', 3.3, 3, 1, 'DC-15SE : Version améliorée de la DC-15S.', 'models/error.mdl', '{}'),
+('arc9_k_dc15s_grenadier', 'DC-15S GL', 'weapons', 'weapon', 3.5, 3, 1, 'DC-15S Grenadier : Carabine avec lance-grenade.', 'models/error.mdl', '{}'),
+('arc9_k_dc19', 'DC-19', 'weapons', 'weapon', 3.5, 3, 1, 'DC-19 : Modèle expérimental de la DC-15S.', 'models/error.mdl', '{}'),
+('arc9_k_dc15a', 'DC-15A', 'weapons', 'weapon', 5.1, 4, 1, 'DC-15A : Fusil blaster standard.', 'models/error.mdl', '{}'),
+('arc9_k_dc15le', 'DC-15LE', 'weapons', 'weapon', 5.8, 4, 1, 'DC-15LE : Variante longue portée du DC-15A.', 'models/error.mdl', '{}'),
+('arc9_k_valken38', 'Valken 38', 'weapons', 'weapon', 6.0, 4, 1, 'Valken 38 : Fusil de précision.', 'models/error.mdl', '{}'),
+('arc9_k_dc15x', 'DC-15X', 'weapons', 'weapon', 6.2, 4, 1, 'DC-15X : Sniper lourd.', 'models/error.mdl', '{}'),
+('arc9_galactic_nt242', 'NT-242', 'weapons', 'weapon', 8.2, 5, 1, 'NT-242 : Fusil anti-blindage.', 'models/error.mdl', '{}'),
+('arc9_galactic_westar35', 'Westar 35', 'weapons', 'weapon', 0.8, 2, 1, 'Westar 35 : Arme mandalorienne.', 'models/error.mdl', '{}'),
+('arc9_k_dc17', 'DC-17', 'weapons', 'weapon', 0.7, 2, 1, 'DC-17 : Pistolet blaster.', 'models/error.mdl', '{}'),
+('arc9_k_dc17sa', 'DC-17SA', 'weapons', 'weapon', 0.8, 2, 1, 'DC-17SA : DC-17 Tactique.', 'models/error.mdl', '{}'),
+('arc9_k_dc17_a', 'DC-17 Akimbo', 'weapons', 'weapon', 1.4, 2, 2, 'DC-17 A : Double pistolet.', 'models/error.mdl', '{}'),
+('arc9_k_dp24', 'DP-24', 'weapons', 'weapon', 4.7, 4, 1, 'DP-24 : Fusil lourd.', 'models/error.mdl', '{}'),
+('arc9_k_e9', 'E-9', 'weapons', 'weapon', 4.9, 4, 1, 'E-9 : Carabine lourde.', 'models/error.mdl', '{}'),
+('arc9_k_dp23', 'DP-23', 'weapons', 'weapon', 4.0, 4, 1, 'DP-23 : Shotgun automatique.', 'models/error.mdl', '{}'),
+('arc9_k_sb2', 'SB-2', 'weapons', 'weapon', 4.3, 4, 1, 'SB-2 : Shotgun lourd.', 'models/error.mdl', '{}'),
+('arc9_galactic_cr2', 'CR-2', 'weapons', 'weapon', 2.8, 3, 1, 'CR-2 : SMG Blaster.', 'models/error.mdl', '{}'),
+('arc9_galactic_cr2c', 'CR-2C', 'weapons', 'weapon', 2.9, 3, 1, 'CR-2C : SMG Compact.', 'models/error.mdl', '{}'),
+('stunstick', 'Matraque', 'weapons', 'weapon', 0.6, 1, 2, 'Stunstick : Arme non létale.', 'models/error.mdl', '{}'),
+('arc9_k_nade_stun', 'Grenade Flash', 'weapons', 'weapon', 0.2, 1, 1, 'Grenade Paralysante.', 'models/error.mdl', '{}'),
+('arc9_k_nade_thermal', 'Grenade Thermale', 'weapons', 'weapon', 0.3, 1, 1, 'Détonateur thermique.', 'models/error.mdl', '{}'),
+('arc9_k_nade_impact', 'Grenade Impact', 'weapons', 'weapon', 0.25, 1, 1, 'Grenade à contact.', 'models/error.mdl', '{}'),
+('arc9_k_republicshield', 'Bouclier', 'weapons', 'weapon', 6.0, 4, 5, 'Bouclier Balistique.', 'models/error.mdl', '{}'),
+('weapon_cuff_police', 'Menottes', 'weapons', 'weapon', 0.3, 1, 1, 'Menottes de police.', 'models/error.mdl', '{}'),
+('arc9_k_e5c', 'E-5C', 'weapons', 'weapon', 3.5, 3, 1, 'E-5C : Variante E-5.', 'models/error.mdl', '{}'),
+('arc9_k_dc17ext_akimbo', 'DC-17 Ext Akimbo', 'weapons', 'weapon', 1.6, 2, 2, 'DC-17 extended Akimbo.', 'models/error.mdl', '{}'),
+('arc9_k_dc17s_akimbo', 'DC-17S Akimbo', 'weapons', 'weapon', 2.0, 2, 2, 'DC17S Akimbo.', 'models/error.mdl', '{}'),
+('arc9_k_dc17sa_akimbo', 'DC-17SA Akimbo', 'weapons', 'weapon', 1.6, 2, 2, 'DC-17SA Akimbo.', 'models/error.mdl', '{}'),
+('arc9_k_dc17ext', 'DC-17 Ext', 'weapons', 'weapon', 0.8, 2, 1, 'DC17ext : Modèle amélioré.', 'models/error.mdl', '{}'),
+('arc9_k_dc17s', 'DC-17S', 'weapons', 'weapon', 1.0, 2, 1, 'DC17S : Modèle amélioré.', 'models/error.mdl', '{}'),
+('arc9_k_rg4d', 'RG-4D', 'weapons', 'weapon', 0.6, 2, 1, 'RG-4D : Pistolet droïde.', 'models/error.mdl', '{}'),
+('arc9_k_dc15a_grenadier', 'DC-15A GL', 'weapons', 'weapon', 5.1, 4, 1, 'DC-15A Grenadier.', 'models/error.mdl', '{}'),
+('arc9_k_dc17m', 'DC-17M', 'weapons', 'weapon', 4.5, 3, 2, 'DC-17M : Arme commando.', 'models/error.mdl', '{}'),
+('arc9_k_dc17m_sniper', 'DC-17M Sniper', 'weapons', 'weapon', 5.0, 4, 2, 'DC-17M : Module Sniper.', 'models/error.mdl', '{}'),
+('arc9_k_e5', 'E-5', 'weapons', 'weapon', 3.5, 3, 1, 'E-5 : Arme droïde.', 'models/error.mdl', '{}'),
+('arc9_k_e5bx', 'E-5BX', 'weapons', 'weapon', 3.5, 3, 1, 'E-5BX : Arme commando droïde.', 'models/error.mdl', '{}'),
+('arc9_k_e5s', 'E-5S', 'weapons', 'weapon', 3.7, 4, 1, 'E-5S : Sniper droïde.', 'models/error.mdl', '{}'),
+('arc9_k_westarm5', 'Westar M-5', 'weapons', 'weapon', 5.0, 3, 2, 'Westar M-5 ARC.', 'models/error.mdl', '{}'),
+('arc9_k_dc17m_shotgun', 'DC-17M Pompe', 'weapons', 'weapon', 4.5, 3, 2, 'DC-17M : Module Pompe.', 'models/error.mdl', '{}'),
+('arc9_k_dp23c', 'DP-23C', 'weapons', 'weapon', 4.2, 4, 1, 'DP-23C Compact.', 'models/error.mdl', '{}'),
+('arc9_k_dp24c', 'DP-24C', 'weapons', 'weapon', 5.0, 4, 1, 'DP-24C Compact.', 'models/error.mdl', '{}'),
+('arc9_k_sg6', 'SG-6', 'weapons', 'weapon', 4.0, 3, 1, 'SG-6.', 'models/error.mdl', '{}'),
+('arc9_k_dc15a_stun', 'DC-15A Stun', 'weapons', 'weapon', 5.1, 4, 1, 'DC-15A Non-Létal.', 'models/error.mdl', '{}'),
+('arc9_k_dc15s_stun', 'DC-15S Stun', 'weapons', 'weapon', 3.5, 3, 1, 'DC-15S Non-Létal.', 'models/error.mdl', '{}'),
+('arc9_k_dc17_stun', 'DC-17 Stun', 'weapons', 'weapon', 0.7, 2, 1, 'DC-17 Non-Létal.', 'models/error.mdl', '{}'),
+('arc9_k_dc15a_training', 'DC-15A Training', 'weapons', 'weapon', 5.1, 4, 1, 'DC-15A Entrainement.', 'models/error.mdl', '{}'),
+('arc9_k_dc15s_training', 'DC-15S Training', 'weapons', 'weapon', 3.5, 3, 1, 'DC-15S Entrainement.', 'models/error.mdl', '{}'),
+('arc9_k_dc17_training', 'DC-17 Training', 'weapons', 'weapon', 0.7, 2, 1, 'DC-17 Entrainement.', 'models/error.mdl', '{}');
+
+-- [[ 3. IMPORTATION DES ACCESSOIRES ]]
+REPLACE INTO aether_definitions (class_id, name, category_id, type, weight, width, height, description, model, data) VALUES
+('arc9_att_ar9_k_f11_scopex2ir', 'Lunette x2 IR', 'attachments', 'item', 1.5, 1, 1, 'Lunette x2 avec module IR intégré.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ammo_at', 'Munition AT', 'attachments', 'item', 0.1, 1, 1, 'Module Anti-Tank.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ammo_charged', 'Munition Chargée', 'attachments', 'item', 0.1, 1, 1, 'Module Dégâts.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ammo_le', 'Munition LE', 'attachments', 'item', 0.1, 1, 1, 'Module Longue Portée.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ubgl_dc15', 'Lance Grenade DC15', 'attachments', 'item', 0.2, 2, 1, 'Module Lance-Grenade.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ammo_scatter', 'Munition Scatter', 'attachments', 'item', 0.1, 1, 1, 'Module Dispersion.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_stun_10', 'Module Stun 10s', 'attachments', 'item', 0.1, 1, 1, 'Stun 10 secondes.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_stun_30', 'Module Stun 30s', 'attachments', 'item', 0.1, 1, 1, 'Stun 30 secondes.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_stun_5', 'Module Stun 5s', 'attachments', 'item', 0.1, 1, 1, 'Stun 5 secondes.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ammo_rocket_cluster', 'Rocket Cluster', 'attachments', 'item', 0.1, 1, 1, 'Rocket Fragmentation.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ammo_rocket_plxpem', 'Rocket EMP', 'attachments', 'item', 0.1, 1, 1, 'Rocket IEM.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ammo_rocket_saclos', 'Rocket Guidée', 'attachments', 'item', 0.1, 1, 1, 'Rocket Guidée.', 'models/error.mdl', '{}'),
+('arc9_att_arc9_ammo_rocket_gas', 'Rocket Gaz', 'attachments', 'item', 0.1, 1, 1, 'Rocket Toxique.', 'models/error.mdl', '{}');
+
+-- [[ 4. IMPORTATION DES ENTITÉS ]]
+REPLACE INTO aether_definitions (class_id, name, category_id, type, weight, width, height, description, model, data) VALUES
+('food_bacon', 'Bacon', 'food', 'entity', 0.1, 1, 1, 'Tranche de bacon.', 'models/error.mdl', '{}'),
+('ent_item_bank', 'Banque', 'entities', 'entity', 30.0, 1, 1, 'Banque de stockage.', 'models/error.mdl', '{}'),
+('npc_droid', 'Droid Dio', 'entities', 'entity', 2.0, 1, 1, 'Droid compagnon.', 'models/error.mdl', '{}');
+
+-- [[ 5. IMPORTATION DES COSMÉTIQUES ]]
+REPLACE INTO aether_definitions (class_id, name, category_id, type, weight, width, height, description, model, data) VALUES
+('ent_casque', 'Casque', 'cosmetics', 'item', 3.0, 2, 2, 'Casque clone.', 'models/error.mdl', '{"slot":1, "bodygroups":{"Casque":{"equipped":0, "unequipped":1}}}'),
+('ent_binoculars', 'Binoculars', 'cosmetics', 'item', 0.75, 2, 1, 'Binoculars.', 'models/error.mdl', '{"slot":2, "bodygroups":{"Binoculars":{"equipped":1, "unequipped":0}}}'),
+('ent_sunvisor', 'Visière', 'cosmetics', 'item', 0.3, 2, 1, 'Visière.', 'models/error.mdl', '{"slot":2, "bodygroups":{"Visiere":{"equipped":1, "unequipped":0}}}'),
+('ent_rangefinder', 'Rangefinder', 'cosmetics', 'item', 0.15, 1, 1, 'Antenne visée.', 'models/error.mdl', '{"slot":3, "bodygroups":{"Rangefinder":{"equipped":1, "unequipped":0}}}'),
+('ent_lampe', 'Lampe', 'cosmetics', 'item', 0.25, 1, 1, 'Lampe.', 'models/error.mdl', '{"slot":4, "bodygroups":{"Lumiere":{"equipped":1, "unequipped":0}}}'),
+('ent_antena', 'Antenne', 'cosmetics', 'item', 0.1, 1, 1, 'Antenne Comms.', 'models/error.mdl', '{"slot":11, "bodygroups":{"Antenne Casque":{"equipped":1, "unequipped":0}}}'),
+('ent_arm_antenna', 'Antenne Epaule', 'cosmetics', 'item', 0.35, 1, 1, 'Antenne Épaule.', 'models/error.mdl', '{}'),
+('ent_pauldron_officer', 'Epaulette Officier', 'cosmetics', 'item', 0.9, 2, 1, 'Épaulette Off.', 'models/error.mdl', '{"slot":5, "bodygroups":{"Epaulette":{"equipped":2, "unequipped":0}}}'),
+('ent_pauldron', 'Epaulette', 'cosmetics', 'item', 0.85, 2, 1, 'Épaulette.', 'models/error.mdl', '{"slot":5, "bodygroups":{"Epaulette":{"equipped":1, "unequipped":0}}}'),
+('ent_backpack', 'Sac à dos', 'cosmetics', 'item', 4.0, 2, 3, 'Sac à dos.', 'models/error.mdl', '{"slot":6, "bodygroups":{"Sac à Dos":{"equipped":1, "unequipped":0}}}'),
+('ent_armor', 'Armure', 'cosmetics', 'item', 3.0, 2, 2, 'Plastron.', 'models/error.mdl', '{}'),
+('ent_aromr_arc', 'Armure ARC', 'cosmetics', 'item', 3.5, 2, 2, 'Plastron ARC.', 'models/error.mdl', '{}'),
+('ent_kama', 'Kama', 'cosmetics', 'item', 2.5, 2, 3, 'Kama.', 'models/error.mdl', '{"slot":10, "bodygroups":{"Kama":{"equipped":1, "unequipped":0}}}');

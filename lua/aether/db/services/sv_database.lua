@@ -16,52 +16,68 @@ local DB_CONFIG = Aether.Config and Aether.Config.Database
 
 -- [[ CONNECTION & KEEP-ALIVE ]]
 function Aether.Database.Initialize()
-    if not mysqloo then
-        require("mysqloo")
+    print("[AETHER] DEBUG: Initializing Database Service...")
+
+    -- 0. Refresh Configuration
+    if Aether.Config and Aether.Config.Database then
+        DB_CONFIG = Aether.Config.Database
     end
 
+    -- 1. Check Module
+    if not mysqloo then
+        local success, _ = pcall(require, "mysqloo")
+        if not success then
+            print("[AETHER] CRITICAL: MySQLoo module missing! Check lua/bin/.")
+            return
+        end
+    end
+
+    -- 2. Check Config
+    if not DB_CONFIG then
+        if file.Exists("aether/db/config/sv_config.lua", "LUA") then
+            include("aether/db/config/sv_config.lua")
+            DB_CONFIG = Aether.Config and Aether.Config.Database
+        end
+        if not DB_CONFIG then
+            ErrorNoHalt("[AETHER] CRITICAL: DB_CONFIG is nil!")
+            return
+        end
+    end
+
+    -- 3. Connect
     if mysqloo then
+        print("[AETHER] DEBUG: Target IP: " .. tostring(DB_CONFIG.host))
+        print("[AETHER] DEBUG: DB Name:   " .. tostring(DB_CONFIG.database))
+
+        print("[AETHER] Calling mysqloo.connect()...")
         Aether.Database.Obj = mysqloo.connect(DB_CONFIG.host, DB_CONFIG.username, DB_CONFIG.password, DB_CONFIG.database,
             DB_CONFIG.port)
 
-        -- Keep-Alive : Empêche l'erreur "MySQL Server has gone away" après 8h d'inactivité
-        -- On ping la DB toutes les 5 minutes (300s)
-        timer.Create("Aether.Database.KeepAlive", 300, 0, function()
-            if Aether.Database.IsConnected and Aether.Database.Obj then
-                local q = Aether.Database.Obj:query("SELECT 1")
-                q:start()
+        if Aether.Database.Obj then
+            print("[AETHER] mysqloo object created: " .. tostring(Aether.Database.Obj))
+            Aether.Database.Obj:setAutoReconnect(true)
+
+            function Aether.Database.Obj:onConnected()
+                print("[AETHER] Database Connected! (MySQLoo)")
+                Aether.Database.IsConnected = true
+                Aether.Database.Failures = 0
+                Aether.Database.CircuitOpen = false
+                Aether.Database.ProcessQueue()
+                if Aether.Migration and Aether.Migration.Run then
+                    Aether.Migration.Run()
+                end
             end
-        end)
 
-        function Aether.Database.Obj:onConnected()
-            print("[AETHER] Database Connected! (MySQLoo)")
-            Aether.Database.IsConnected = true
+            function Aether.Database.Obj:onConnectionFailed(err)
+                print("[AETHER] !!! FATAL DB ERROR !!!")
+                print("[AETHER] Connection Error: '" .. tostring(err) .. "'")
+            end
 
-            -- Réinitialiser le Circuit Breaker en cas de reconnexion réussie
-            Aether.Database.Failures = 0
-            Aether.Database.CircuitOpen = false
-
-            Aether.Database.ProcessQueue()
-            Aether.Migration.Run()
+            print("[AETHER] Calling Obj:connect()...")
+            Aether.Database.Obj:connect()
+        else
+            print("[AETHER] CRITICAL: mysqloo.connect returned nil!")
         end
-
-        function Aether.Database.Obj:onConnectionFailed(err)
-            print("\n[AETHER] !!! FATAL DB ERROR !!!")
-            print("[AETHER] Connection Error: '" .. tostring(err) .. "'")
-            print("[AETHER] !!! SWITCHING TO SQLITE !!!\n")
-
-            Aether.Database.IsConnected = false
-            Aether.Database.Obj = nil -- Force nil pour activer le fallback SQLite
-
-            -- Fallback immédiat
-            Aether.Migration.Run()
-        end
-
-        Aether.Database.Obj:connect()
-    else
-        print("[AETHER] MySQLoo not found! Falling back to SQLite.")
-        Aether.Database.IsConnected = true
-        Aether.Migration.Run()
     end
 end
 
@@ -98,7 +114,7 @@ function Aether.Database.Prepare(sqlStr, params, callback, errorCallback)
         end
 
         function stmt:onSuccess(data)
-            if callback then callback(data) end
+            if callback then callback(data, stmt:lastInsert(), stmt:affectedRows()) end
         end
 
         function stmt:onError(err)
@@ -158,7 +174,7 @@ function Aether.Database.Query(queryStr, callback, errorCallback)
     local q = Aether.Database.Obj:query(queryStr)
 
     function q:onSuccess(data)
-        if callback then callback(data) end
+        if callback then callback(data, q:lastInsert(), q:affectedRows()) end
     end
 
     function q:onError(err)
@@ -276,19 +292,39 @@ hook.Add("Initialize", "Aether.Database.Init", function()
     Aether.Database.Initialize()
 end)
 
-hook.Add("Aether.Database.Ready", "Aether.Account.LoadOrgs", function()
-    if Aether.Services and Aether.Services.Account then
-        Aether.Services.Account.LoadAllOrganizations()
-    end
-end)
-
 -- COMMANDES DEBUG
 concommand.Add("aether_reload_db", function(ply, cmd, args)
     if IsValid(ply) and not ply:IsSuperAdmin() then return end
-    print("[AETHER] Reloading Database...")
-    if file.Exists("aether/core/sv_config.lua", "LUA") then
-        include("aether/core/sv_config.lua")
+    print("[AETHER] Reloading Database System...")
+
+    -- 1. Reload Config
+    if file.Exists("aether/db/config/sv_config.lua", "LUA") then
+        include("aether/db/config/sv_config.lua")
+        print("[AETHER] Config Reloaded.")
+    else
+        print("[AETHER] ERROR: Config file missing!")
     end
+
+    -- 2. Reload Migration Service
+    if file.Exists("aether/db/services/sv_migration.lua", "LUA") then
+        include("aether/db/services/sv_migration.lua")
+        print("[AETHER] Migration Service Reloaded.")
+    end
+
+    -- 3. Reset Connection
+    if Aether.Database.Obj and Aether.Database.IsConnected then
+        print("[AETHER] Closing existing connection...")
+        -- Aether.Database.Obj:disconnect() -- Not always available depending on version
+        Aether.Database.Obj = nil
+        Aether.Database.IsConnected = false
+    end
+
+    print("[AETHER] Resetting Circuit Breaker...")
     Aether.Database.CircuitOpen = false
-    Aether.Database.Initialize()
+
+    print("[AETHER] Calling Initialize()...")
+    local success, err = pcall(Aether.Database.Initialize)
+    if not success then
+        print("[AETHER] CRITICAL ERROR during Initialize: " .. tostring(err))
+    end
 end)

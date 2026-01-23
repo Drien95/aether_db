@@ -5,10 +5,10 @@
 Aether.Config = Aether.Config or {}
 
 Aether.Config.Database = {
-    host = "localhost",
+    host = "127.0.0.1",
     username = "root",
-    password = "",
-    database = "v2_aether_dev",
+    password = "root",
+    database = "v6_aether_dev",
     port = 3306
 }
 
