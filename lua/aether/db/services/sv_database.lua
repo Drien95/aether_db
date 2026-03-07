@@ -101,15 +101,24 @@ function Aether.Database.Prepare(sqlStr, params, callback, errorCallback)
         local stmt = Aether.Database.Obj:prepare(sqlStr)
 
         if type(params) == "table" then
-            for i, v in ipairs(params) do
-                local t = type(v)
-                if t == "number" then
-                    stmt:setNumber(i, v)
-                elseif t == "boolean" then
-                    stmt:setBoolean(i, v)
-                else
-                    stmt:setString(i, tostring(v))
+            -- Compter le max index via pairs (ipairs s'arrête au premier nil, créant des trous)
+            local paramCount = 0
+            for k in pairs(params) do
+                if type(k) == "number" and k > paramCount then paramCount = k end
+            end
+            for i = 1, paramCount do
+                local v = params[i]
+                if v ~= nil then
+                    local t = type(v)
+                    if t == "number" then
+                        stmt:setNumber(i, v)
+                    elseif t == "boolean" then
+                        stmt:setBoolean(i, v)
+                    else
+                        stmt:setString(i, tostring(v))
+                    end
                 end
+                -- nil = non bindé → MySQLoo envoie NULL à MySQL (comportement attendu)
             end
         end
 
@@ -130,15 +139,16 @@ function Aether.Database.Prepare(sqlStr, params, callback, errorCallback)
 
         -- Emulation des Prepared Statements pour éviter les Injections SQL
         if type(params) == "table" then
-            for _, v in ipairs(params) do
-                local safeVal = Aether.Database.Escape(v)
+            -- Même fix : ipairs s'arrête aux trous nil, on itère manuellement jusqu'au max index
+            local paramCount = 0
+            for k in pairs(params) do
+                if type(k) == "number" and k > paramCount then paramCount = k end
+            end
+            for i = 1, paramCount do
+                local safeVal = Aether.Database.Escape(params[i]) -- Escape(nil) = "NULL"
 
-                -- Recherche la position du premier '?'
-                -- 'true' dans string.find désactive les patterns Lua pour chercher le caractère littéral
                 local startPos = string.find(finalSQL, "?", 1, true)
-
                 if startPos then
-                    -- Remplace le '?' par la valeur échappée
                     finalSQL = string.sub(finalSQL, 1, startPos - 1) .. safeVal .. string.sub(finalSQL, startPos + 1)
                 end
             end
