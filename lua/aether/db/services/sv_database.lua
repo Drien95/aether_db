@@ -7,6 +7,13 @@ Aether.Database.Queue = {}
 Aether.Database.IsConnected = false
 Aether.Database.IsProcessingQueue = false -- Flag pour éviter les doubles exécutions
 
+-- [[ FILE LOGGER (debug temporaire) ]]
+local function AetherLog(msg)
+    print(msg)
+    local timestamp = os.date("%Y-%m-%d %H:%M:%S")
+    file.Append("aether_db_log.txt", "[" .. timestamp .. "] " .. msg .. "\n")
+end
+
 -- [[ CONFIGURATION ]]
 if file.Exists("aether/db/config/sv_config.lua", "LUA") then
     include("aether/db/config/sv_config.lua")
@@ -16,7 +23,7 @@ local DB_CONFIG = Aether.Config and Aether.Config.Database
 
 -- [[ CONNECTION & KEEP-ALIVE ]]
 function Aether.Database.Initialize()
-    print("[AETHER] DEBUG: Initializing Database Service...")
+    AetherLog("[AETHER] DEBUG: Initializing Database Service...")
 
     -- 0. Refresh Configuration
     if Aether.Config and Aether.Config.Database then
@@ -25,9 +32,9 @@ function Aether.Database.Initialize()
 
     -- 1. Check Module
     if not mysqloo then
-        local success, _ = pcall(require, "mysqloo")
+        local success, requireErr = pcall(require, "mysqloo")
         if not success then
-            print("[AETHER] CRITICAL: MySQLoo module missing! Check lua/bin/.")
+            AetherLog("[AETHER] CRITICAL: MySQLoo require failed: " .. tostring(requireErr))
             return
         end
     end
@@ -39,26 +46,28 @@ function Aether.Database.Initialize()
             DB_CONFIG = Aether.Config and Aether.Config.Database
         end
         if not DB_CONFIG then
-            ErrorNoHalt("[AETHER] CRITICAL: DB_CONFIG is nil!")
+            AetherLog("[AETHER] CRITICAL: DB_CONFIG is nil!")
             return
         end
     end
 
     -- 3. Connect
     if mysqloo then
-        print("[AETHER] DEBUG: Target IP: " .. tostring(DB_CONFIG.host))
-        print("[AETHER] DEBUG: DB Name:   " .. tostring(DB_CONFIG.database))
+        AetherLog("[AETHER] DEBUG: Target IP: " .. tostring(DB_CONFIG.host))
+        AetherLog("[AETHER] DEBUG: DB Name:   " .. tostring(DB_CONFIG.database))
+        AetherLog("[AETHER] DEBUG: Port:       " .. tostring(DB_CONFIG.port))
+        AetherLog("[AETHER] DEBUG: User:       " .. tostring(DB_CONFIG.username))
 
-        print("[AETHER] Calling mysqloo.connect()...")
+        AetherLog("[AETHER] Calling mysqloo.connect()...")
         Aether.Database.Obj = mysqloo.connect(DB_CONFIG.host, DB_CONFIG.username, DB_CONFIG.password, DB_CONFIG.database,
             DB_CONFIG.port)
 
         if Aether.Database.Obj then
-            print("[AETHER] mysqloo object created: " .. tostring(Aether.Database.Obj))
+            AetherLog("[AETHER] mysqloo object created: " .. tostring(Aether.Database.Obj))
             Aether.Database.Obj:setAutoReconnect(true)
 
             function Aether.Database.Obj:onConnected()
-                print("[AETHER] Database Connected! (MySQLoo)")
+                AetherLog("[AETHER] Database Connected! (MySQLoo)")
                 Aether.Database.IsConnected = true
                 Aether.Database.Failures = 0
                 Aether.Database.CircuitOpen = false
@@ -69,14 +78,14 @@ function Aether.Database.Initialize()
             end
 
             function Aether.Database.Obj:onConnectionFailed(err)
-                print("[AETHER] !!! FATAL DB ERROR !!!")
-                print("[AETHER] Connection Error: '" .. tostring(err) .. "'")
+                AetherLog("[AETHER] !!! FATAL DB ERROR !!!")
+                AetherLog("[AETHER] Connection Error: '" .. tostring(err) .. "'")
             end
 
-            print("[AETHER] Calling Obj:connect()...")
+            AetherLog("[AETHER] Calling Obj:connect()...")
             Aether.Database.Obj:connect()
         else
-            print("[AETHER] CRITICAL: mysqloo.connect returned nil!")
+            AetherLog("[AETHER] CRITICAL: mysqloo.connect returned nil!")
         end
     end
 end
