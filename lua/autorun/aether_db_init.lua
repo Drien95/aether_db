@@ -19,6 +19,7 @@ local function LoadAetherDB()
     if SERVER then
         include("aether/db/services/sv_database.lua")
         include("aether/db/services/sv_migration.lua")
+        include("aether/db/services/sv_seed.lua")
     end
 end
 
